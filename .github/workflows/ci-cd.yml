@@ -1,5 +1,5 @@
 # Pipeline CI/CD — TP2 DevOps HESTIM
-# À chaque push sur main : tests, construction de l'image, publication sur ghcr.io
+# À chaque push sur main : tests, construction de l'image (amd64 + arm64), publication sur ghcr.io
 name: CI/CD
 
 on:
@@ -39,6 +39,9 @@ jobs:
       - name: Récupérer le code
         uses: actions/checkout@v6
 
+      - name: Préparer l'émulation multi-architecture (QEMU)
+        uses: docker/setup-qemu-action@v4
+
       - name: Préparer Docker Buildx
         uses: docker/setup-buildx-action@v4
 
@@ -62,6 +65,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
